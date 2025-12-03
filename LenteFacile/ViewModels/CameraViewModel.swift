@@ -9,38 +9,34 @@ import SwiftUI
 import AVFoundation
 import Combine
 
-// MARK: - Camera Service (Background Logic)
+// MARK: - Camera Service (Logica Background)
 
 /// Gestisce la complessità di AVFoundation su una coda seriale dedicata.
-/// Marcato @unchecked Sendable per gestire manualmente la thread-safety di oggetti non-Sendable (AVCaptureSession, ecc).
 private final class CameraService: NSObject, @unchecked Sendable {
     
-    // Queue seriale per evitare blocchi del Main Thread
     private let sessionQueue = DispatchQueue(label: "com.lentesemplice.cameraSession")
-    
     private var session: AVCaptureSession?
     private var output = AVCapturePhotoOutput()
     private var videoDeviceInput: AVCaptureDeviceInput?
     
-    // Callback verso il ViewModel (eseguiti su MainActor)
     var onSessionReady: ((AVCaptureSession) -> Void)?
     var onPhotoCaptured: ((UIImage) -> Void)?
     var onError: ((Error) -> Void)?
     
-    // Settings
     private var magSettings = MagnificationSettings.load()
     
     override init() {
         super.init()
     }
     
-    func start() {
-        checkPermissions()
-    }
+    // MARK: - Lifecycle
+    
+    func start() { checkPermissions() }
     
     func stop() {
         sessionQueue.async { [weak self] in
             self?.session?.stopRunning()
+            self?.internalSetTorch(on: false)
         }
     }
     
@@ -56,30 +52,23 @@ private final class CameraService: NSObject, @unchecked Sendable {
     
     private func checkPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized:
-            setupCamera()
+        case .authorized: setupCamera()
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 if granted { self?.setupCamera() }
             }
-        default:
-            // Gestire caso negato se necessario
-            break
+        default: break
         }
     }
     
     private func setupCamera() {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
-            
             let newSession = AVCaptureSession()
             newSession.beginConfiguration()
-            newSession.sessionPreset = .photo // Preset Photo gestisce alta risoluzione automaticamente
+            newSession.sessionPreset = .photo
             
-            // Input
-            guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
-                return
-            }
+            guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else { return }
             
             do {
                 let input = try AVCaptureDeviceInput(device: videoDevice)
@@ -87,19 +76,12 @@ private final class CameraService: NSObject, @unchecked Sendable {
                     newSession.addInput(input)
                     self.videoDeviceInput = input
                 }
-                
-                // Output
                 if newSession.canAddOutput(self.output) {
                     newSession.addOutput(self.output)
-                    // Nota: isHighResolutionCaptureEnabled è deprecato in iOS 16+.
-                    // Il preset .photo e le impostazioni di scatto gestiscono la qualità.
-                    // Impostiamo maxPhotoDimensions usando le dimensioni dal formato attivo.
-                    let dims = CMVideoFormatDescriptionGetDimensions(videoDevice.activeFormat.formatDescription)
-                    if dims.width > 0 && dims.height > 0 {
-                        self.output.maxPhotoDimensions = dims
+                    if let maxDims = videoDevice.activeFormat.supportedMaxPhotoDimensions.last {
+                        self.output.maxPhotoDimensions = maxDims
                     }
                 }
-                
             } catch {
                 print("CameraService Error: \(error)")
                 self.notifyError(error)
@@ -108,119 +90,106 @@ private final class CameraService: NSObject, @unchecked Sendable {
             newSession.commitConfiguration()
             newSession.startRunning()
             self.session = newSession
-            
-            // Zoom Iniziale
             self.internalSetZoom(factor: self.magSettings.startingZoom)
             
-            // Notifica ViewModel
-            DispatchQueue.main.async {
-                self.onSessionReady?(newSession)
-            }
+            DispatchQueue.main.async { self.onSessionReady?(newSession) }
         }
     }
     
     // MARK: - Actions
     
     func setZoom(factor: CGFloat) {
+        sessionQueue.async { [weak self] in self?.internalSetZoom(factor: factor) }
+    }
+    
+    func setTorch(on: Bool) {
+        sessionQueue.async { [weak self] in self?.internalSetTorch(on: on) }
+    }
+    
+    func capturePhoto() {
         sessionQueue.async { [weak self] in
-            self?.internalSetZoom(factor: factor)
+            guard let self = self else { return }
+            let settings = AVCapturePhotoSettings()
+            settings.flashMode = .off
+            if self.output.maxPhotoDimensions.width > 0 {
+                settings.maxPhotoDimensions = self.output.maxPhotoDimensions
+            }
+            self.output.capturePhoto(with: settings, delegate: self)
         }
+    }
+    
+    // MARK: - Internal Helpers
+    
+    private func internalSetTorch(on: Bool) {
+        guard let device = videoDeviceInput?.device, device.hasTorch, device.isTorchAvailable else { return }
+        do {
+            try device.lockForConfiguration()
+            device.torchMode = on ? .on : .off
+            if on { try device.setTorchModeOn(level: 1.0) }
+            device.unlockForConfiguration()
+        } catch { print("Torch error: \(error)") }
     }
     
     private func internalSetZoom(factor: CGFloat) {
         guard let input = self.videoDeviceInput else { return }
         let device = input.device
-        
         do {
             try device.lockForConfiguration()
             let maxDeviceZoom = min(device.activeFormat.videoMaxZoomFactor, 10.0)
             let effectiveZoom = max(1.0, min(factor, maxDeviceZoom))
             device.videoZoomFactor = effectiveZoom
             device.unlockForConfiguration()
-            
-            // Salva preferenza (fire & forget)
             Task { @MainActor in
                 if self.magSettings.rememberLastZoom {
                     self.magSettings.updateLastUsedZoom(effectiveZoom)
                     self.magSettings.save()
                 }
             }
-        } catch {
-            print("Zoom Error: \(error)")
-        }
+        } catch { print("Zoom Error: \(error)") }
     }
     
-    func capturePhoto() {
-        sessionQueue.async { [weak self] in
-            guard let self = self else { return }
-            
-            let settings = AVCapturePhotoSettings()
-            settings.flashMode = .off
-            // Richiediamo alta risoluzione se supportata dal formato
-            if self.output.maxPhotoDimensions.width > 0 {
-                settings.maxPhotoDimensions = self.output.maxPhotoDimensions
-            }
-            
-            self.output.capturePhoto(with: settings, delegate: self)
-        }
-    }
-    
-    nonisolated private func notifyError(_ error: Error) {
+    private func notifyError(_ error: Error) {
         DispatchQueue.main.async { self.onError?(error) }
     }
 }
 
-// MARK: - AVCaptureDelegate (Background)
+// MARK: - AVCaptureDelegate
 
-// Make the conformance explicitly nonisolated so it can be used from the sessionQueue.
-nonisolated extension CameraService: AVCapturePhotoCaptureDelegate {
+extension CameraService: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let error = error {
-            notifyError(error)
-            return
-        }
-        
-        guard let data = photo.fileDataRepresentation(),
-              let image = UIImage(data: data) else { return }
-        
-        // Esegui la normalizzazione dell'orientamento sul MainActor (UIKit drawing è @MainActor)
-        DispatchQueue.main.async {
-            let fixedImage = image.fixOrientation()
-            self.onPhotoCaptured?(fixedImage)
-        }
+        guard error == nil, let data = photo.fileDataRepresentation(), let image = UIImage(data: data) else { return }
+        let fixedImage = image.fixOrientation()
+        DispatchQueue.main.async { self.onPhotoCaptured?(fixedImage) }
     }
 }
 
-// MARK: - ViewModel (MainActor UI Logic)
+// MARK: - ViewModel (MainActor Logic)
 
 @MainActor
 final class CameraViewModel: ObservableObject {
     
-    // MARK: - Published Properties
     @Published var session: AVCaptureSession?
-    @Published var zoomFactor: CGFloat = 1.0 {
-        didSet {
-            // Evita loop infiniti se aggiornato internamente, ma qui zoomFactor guida il servizio
-            service.setZoom(factor: zoomFactor)
-        }
-    }
-    
+    @Published var zoomFactor: CGFloat = 1.0 { didSet { service.setZoom(factor: zoomFactor) } }
+    @Published var isTorchOn: Bool = false
     @Published var isFrozen: Bool = false
     @Published var frozenImage: UIImage?
-    @Published var permissionGranted: Bool = false // Semplificato per UI
+    @Published var permissionGranted: Bool = false
     
-    // MARK: - Dependencies
+    // OCR State
+    @Published var isReading: Bool = false
+    @Published var isProcessingOCR: Bool = false
+    @Published var scannedText: String = ""
+    
     private let service = CameraService()
     
-    // MARK: - Init
     init() {
+        let initialSettings = MagnificationSettings.load()
+        self.zoomFactor = initialSettings.startingZoom
         setupBindings()
         service.start()
         
-        // Sync iniziale zoom visuale
-        let initialSettings = MagnificationSettings.load()
-        self.zoomFactor = initialSettings.startingZoom
-        self.permissionGranted = true // Assunto true mentre carichiamo, gestito meglio dallo stato sessione
+        // Non chiudere automaticamente il note alla fine della lettura
+        OCRManager.shared.onSpeechDidFinish = { }
     }
     
     private func setupBindings() {
@@ -228,68 +197,89 @@ final class CameraViewModel: ObservableObject {
             self?.session = session
             self?.permissionGranted = true
         }
-        
         service.onPhotoCaptured = { [weak self] image in
             self?.handlePhotoCaptured(image)
         }
-        
         service.onError = { error in
             HapticManager.shared.error()
-            print("Camera Error: \(error)")
         }
     }
     
-    // MARK: - Logic
+    // MARK: - Actions
+    
+    func toggleTorch() {
+        HapticManager.shared.buttonTap()
+        isTorchOn.toggle()
+        service.setTorch(on: isTorchOn)
+    }
     
     func toggleFreeze() {
         if isFrozen {
             unfreeze()
         } else {
             HapticManager.shared.buttonTap()
-            service.capturePhoto() // Scatta foto per il freeze
+            service.capturePhoto()
         }
     }
     
+    func stopReading() {
+        isReading = false
+        OCRManager.shared.stop()
+        HapticManager.shared.buttonTap()
+    }
+    
+    func startReading(croppedImage: UIImage) {
+        HapticManager.shared.buttonTap()
+        isProcessingOCR = true
+        scannedText = ""
+        
+        Task {
+            // 1. Riconoscimento testo grezzo
+            let rawText = await OCRManager.shared.recognizeText(in: croppedImage)
+            
+            if let text = rawText {
+                // 2. Normalizzazione Intelligente (Date, Prezzi)
+                let normalizedText = OCRManager.shared.normalizeText(text)
+                
+                // 3. Aggiorna UI (Mostra foglietto SOLO con testo originale normalizzato)
+                // Rimossa logica di traduzione
+                self.scannedText = normalizedText
+                self.isProcessingOCR = false
+                self.isReading = true
+                
+                // 4. Parla
+                OCRManager.shared.speak(normalizedText)
+            } else {
+                self.isProcessingOCR = false
+                HapticManager.shared.error()
+                OCRManager.shared.speak("Nessun testo trovato.")
+            }
+        }
+    }
+    
+    // MARK: - Private Logic
+    
     private func handlePhotoCaptured(_ image: UIImage) {
         self.frozenImage = image
-        withAnimation {
-            self.isFrozen = true
+        withAnimation { self.isFrozen = true }
+        if isTorchOn {
+            isTorchOn = false
+            service.setTorch(on: false)
         }
-        
         HapticManager.shared.freezeActivated()
         AudioManager.shared.playFreezeSound()
-        
-        // Stop sessione live per risparmio risorse
         service.stop()
     }
     
     private func unfreeze() {
+        stopReading()
         withAnimation {
             isFrozen = false
             frozenImage = nil
+            scannedText = ""
         }
-        
         HapticManager.shared.freezeDeactivated()
         AudioManager.shared.playUnfreezeSound()
-        
-        // Riavvia sessione live
         service.resume()
     }
 }
-
-// MARK: - Image Helper (Pure Extension)
-
-extension UIImage {
-    /// Corregge l'orientamento dell'immagine (Pure Function, Thread Safe)
-    func fixOrientation() -> UIImage {
-        if self.imageOrientation == .up { return self }
-        
-        UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
-        self.draw(in: CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height))
-        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return normalizedImage ?? self
-    }
-}
-
