@@ -155,7 +155,7 @@ private final class CameraService: NSObject, @unchecked Sendable {
 
 // MARK: - AVCaptureDelegate
 
-extension CameraService: AVCapturePhotoCaptureDelegate {
+nonisolated extension CameraService: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard error == nil, let data = photo.fileDataRepresentation(), let image = UIImage(data: data) else { return }
         let fixedImage = image.fixOrientation()
@@ -241,13 +241,12 @@ final class CameraViewModel: ObservableObject {
                 // 2. Normalizzazione Intelligente (Date, Prezzi)
                 let normalizedText = OCRManager.shared.normalizeText(text)
                 
-                // 3. Aggiorna UI (Mostra foglietto SOLO con testo originale normalizzato)
-                // Rimossa logica di traduzione
+                // 3. Aggiorna UI con testo pulito
                 self.scannedText = normalizedText
                 self.isProcessingOCR = false
                 self.isReading = true
                 
-                // 4. Parla
+                // 4. Parla (usa sempre lingua device)
                 OCRManager.shared.speak(normalizedText)
             } else {
                 self.isProcessingOCR = false

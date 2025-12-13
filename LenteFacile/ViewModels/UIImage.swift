@@ -10,7 +10,7 @@ import UIKit
 extension UIImage {
     /// Returns an image whose pixel data is rotated so that its imageOrientation is .up.
     /// If the image is already .up, it returns self.
-    func fixOrientation() -> UIImage {
+    nonisolated func fixOrientation() -> UIImage {
         // If already correct, return as is
         if imageOrientation == .up {
             return self

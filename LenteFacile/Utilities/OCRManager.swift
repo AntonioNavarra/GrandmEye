@@ -38,16 +38,15 @@ final class OCRManager: NSObject, AVSpeechSynthesizerDelegate {
                 continuation.resume(returning: text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : text)
             }
             request.recognitionLevel = .accurate
+            // Supporto multilingua: Lingua corrente + Inglese come fallback comune
             let currentLang = Locale.current.identifier
-            request.recognitionLanguages = [currentLang, "en-US"]
+            request.recognitionLanguages = [currentLang, "en-US", "fr-FR", "es-ES", "de-DE"]
             request.usesLanguageCorrection = true
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             try? handler.perform([request])
         }
     }
     
-    /// Normalizza il testo (Date, Prezzi) per renderlo leggibile e ascoltabile.
-    /// Ora è pubblico per poter mostrare il testo elaborato nella UI.
     func normalizeText(_ text: String) -> String {
         var result = text
         result = normalizeDates(in: result)
@@ -56,13 +55,17 @@ final class OCRManager: NSObject, AVSpeechSynthesizerDelegate {
         return result
     }
     
-    /// Legge il testo fornito.
+    /// Legge il testo fornito utilizzando sempre la lingua del dispositivo.
+    /// - Parameter text: Il testo da leggere.
     func speak(_ text: String) {
         stop()
         
         let utterance = AVSpeechUtterance(string: text)
-        let currentLang = Locale.current.identifier
-        utterance.voice = AVSpeechSynthesisVoice(language: currentLang)
+        
+        // Configura la voce basandosi esclusivamente sulla lingua del telefono
+        let voiceLang = Locale.current.identifier
+        utterance.voice = AVSpeechSynthesisVoice(language: voiceLang)
+        
         utterance.rate = 0.5
         utterance.pitchMultiplier = 1.0
         
