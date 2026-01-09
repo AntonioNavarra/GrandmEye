@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		EA8A1F352ED4C71400AF3C87 /* ReadExpiryDates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadExpiryDates.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA8A1F352ED4C71400AF3C87 /* EasyReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EasyReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		EA8A1F532ED4CA5C00AF3C87 /* ReadExpiryDates */ = {
+		EA8A1F532ED4CA5C00AF3C87 /* EasyReader */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ReadExpiryDates;
+			path = EasyReader;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		EA8A1F2C2ED4C71400AF3C87 = {
 			isa = PBXGroup;
 			children = (
-				EA8A1F532ED4CA5C00AF3C87 /* ReadExpiryDates */,
+				EA8A1F532ED4CA5C00AF3C87 /* EasyReader */,
 				EA8A1F362ED4C71400AF3C87 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		EA8A1F362ED4C71400AF3C87 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EA8A1F352ED4C71400AF3C87 /* ReadExpiryDates.app */,
+				EA8A1F352ED4C71400AF3C87 /* EasyReader.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		EA8A1F342ED4C71400AF3C87 /* ReadExpiryDates */ = {
+		EA8A1F342ED4C71400AF3C87 /* EasyReader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EA8A1F402ED4C71600AF3C87 /* Build configuration list for PBXNativeTarget "ReadExpiryDates" */;
+			buildConfigurationList = EA8A1F402ED4C71600AF3C87 /* Build configuration list for PBXNativeTarget "EasyReader" */;
 			buildPhases = (
 				EA8A1F312ED4C71400AF3C87 /* Sources */,
 				EA8A1F322ED4C71400AF3C87 /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				EA8A1F532ED4CA5C00AF3C87 /* ReadExpiryDates */,
+				EA8A1F532ED4CA5C00AF3C87 /* EasyReader */,
 			);
-			name = ReadExpiryDates;
+			name = EasyReader;
 			packageProductDependencies = (
 			);
 			productName = LenteFacile;
-			productReference = EA8A1F352ED4C71400AF3C87 /* ReadExpiryDates.app */;
+			productReference = EA8A1F352ED4C71400AF3C87 /* EasyReader.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = EA8A1F302ED4C71400AF3C87 /* Build configuration list for PBXProject "ReadExpiryDates" */;
+			buildConfigurationList = EA8A1F302ED4C71400AF3C87 /* Build configuration list for PBXProject "EasyReader" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				EA8A1F342ED4C71400AF3C87 /* ReadExpiryDates */,
+				EA8A1F342ED4C71400AF3C87 /* EasyReader */,
 			);
 		};
 /* End PBXProject section */
@@ -331,7 +331,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EA8A1F302ED4C71400AF3C87 /* Build configuration list for PBXProject "ReadExpiryDates" */ = {
+		EA8A1F302ED4C71400AF3C87 /* Build configuration list for PBXProject "EasyReader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EA8A1F3E2ED4C71600AF3C87 /* Debug */,
@@ -340,7 +340,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EA8A1F402ED4C71600AF3C87 /* Build configuration list for PBXNativeTarget "ReadExpiryDates" */ = {
+		EA8A1F402ED4C71600AF3C87 /* Build configuration list for PBXNativeTarget "EasyReader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EA8A1F412ED4C71600AF3C87 /* Debug */,
