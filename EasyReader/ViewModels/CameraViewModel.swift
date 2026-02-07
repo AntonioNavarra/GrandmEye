@@ -1,6 +1,6 @@
 //
 //  CameraViewModel.swift
-//  LenteFacile
+//  EasyReader
 //
 //  Created by Antonio Navarra on 24/11/25.
 //
@@ -14,7 +14,7 @@ import Combine
 /// Gestisce la complessità di AVFoundation su una coda seriale dedicata.
 private final class CameraService: NSObject, @unchecked Sendable {
     
-    private let sessionQueue = DispatchQueue(label: "com.lentesemplice.cameraSession")
+    private let sessionQueue = DispatchQueue(label: "com.EasyReader.cameraSession")
     private var session: AVCaptureSession?
     private var output = AVCapturePhotoOutput()
     private var videoDeviceInput: AVCaptureDeviceInput?
@@ -277,7 +277,7 @@ final class CameraViewModel: ObservableObject {
             frozenImage = nil
             scannedText = ""
         }
-        HapticManager.shared.freezeDeactivated()
+        HapticManager.shared.freezeActivated()
         AudioManager.shared.playUnfreezeSound()
         service.resume()
     }

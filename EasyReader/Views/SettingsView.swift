@@ -1,10 +1,3 @@
-//
-//  SettingsView.swift
-//  LenteFacile
-//
-//  Created by Antonio Navarra on 25/11/25.
-//
-
 import SwiftUI
 
 struct SettingsView: View {
@@ -18,12 +11,10 @@ struct SettingsView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        
-                        // SEZIONE A: Ingrandimento
-                        SettingsCard(title: Localization.magnificationSection, icon: "magnifyingglass") {
+                        SettingsCard(title: "settings_magnification", icon: "magnifyingglass") {
                             VStack(alignment: .leading, spacing: 20) {
                                 VStack(alignment: .leading) {
-                                    Text("\(Localization.defaultZoom): \(String(format: "%.1fx", viewModel.magSettings.defaultZoomLevel))")
+                                    Text("\(String(localized: "settings_default_zoom")): \(String(format: "%.1fx", viewModel.magSettings.defaultZoomLevel))")
                                         .font(.body)
                                         .foregroundColor(.white)
                                     
@@ -37,25 +28,21 @@ struct SettingsView: View {
                                     .accentColor(Color("AccentColor"))
                                 }
                                 
-                                Toggle(Localization.rememberZoom, isOn: $viewModel.magSettings.rememberLastZoom)
+                                Toggle("settings_remember_zoom", isOn: $viewModel.magSettings.rememberLastZoom)
                                     .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
                             }
                         }
                         
-                        // SEZIONE B: Audio e Feedback
-                        SettingsCard(title: Localization.audioSection, icon: "waveform") {
+                        SettingsCard(title: "settings_sensory_feedback", icon: "waveform") {
                             VStack(spacing: 16) {
-                                Toggle(Localization.soundInterface, isOn: $viewModel.appSettings.soundEnabled)
+                                Toggle("settings_interface_sounds", isOn: $viewModel.appSettings.soundEnabled)
                                     .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
                                 
-                                Toggle(Localization.hapticFeedback, isOn: $viewModel.appSettings.hapticEnabled)
+                                Toggle("settings_haptic_feedback", isOn: $viewModel.appSettings.hapticEnabled)
                                     .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
                             }
                         }
                         
-                        // RIMOSSO: Sezione Visual Appearance
-                        
-                        // SEZIONE C: Info e Reset
                         VStack(spacing: 20) {
                             Text(viewModel.appVersion)
                                 .font(.caption)
@@ -64,7 +51,7 @@ struct SettingsView: View {
                             Button(action: {
                                 viewModel.resetAllSettings()
                             }) {
-                                Text(Localization.resetSettings)
+                                Text("settings_reset")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(.red)
@@ -80,11 +67,11 @@ struct SettingsView: View {
                     .padding(.top)
                 }
             }
-            .navigationTitle(Localization.settingsTitle)
+            .navigationTitle("settings_title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Localization.close) {
+                    Button("settings_close") {
                         HapticManager.shared.buttonTap()
                         dismiss()
                     }

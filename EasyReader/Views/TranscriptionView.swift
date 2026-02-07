@@ -1,50 +1,43 @@
-//
-//  TranscriptionView.swift
-//  LenteFacile
-//
-//  Created by Antonio Navarra on 28/11/25.
-//
-
 import SwiftUI
 
-/// Un "foglietto" digitale che mostra il testo trascritto.
-/// La logica di traduzione e rilevamento lingua è ora delegata al ViewModel.
+/// A view that displays transcribed text using native String Catalog keys.
 struct TranscriptionView: View {
     let text: String
     var onClose: () -> Void
     
     var body: some View {
         ZStack {
-            // Sfondo oscurante
+            // Background overlay
             Color.black.opacity(0.7)
                 .ignoresSafeArea()
             
-            // Il Foglietto
+            // Transcription sheet
             VStack(spacing: 0) {
-                // Header Foglietto
+                // Header
                 HStack {
                     Image(systemName: "doc.text.magnifyingglass")
                         .foregroundColor(.black)
                     
-                    Text(Localization.transcriptionTitle)
+                    // Native key from Localizable.xcstrings
+                    Text("transcription_title")
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                     
                     Spacer()
                     
-                    // Pulsante chiusura (Unico modo per chiudere)
+                    // Close button
                     Button(action: onClose) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title2)
                             .foregroundColor(.black.opacity(0.6))
-                            .frame(width: 44, height: 44) // Touch target aumentato
+                            .frame(width: 44, height: 44)
                     }
                 }
                 .padding()
-                .background(Color("AccentColor")) // Giallo
+                .background(Color("AccentColor"))
                 
-                // Corpo del Testo
+                // Content
                 ScrollView {
                     Text(text)
                         .font(.system(size: 24, weight: .medium, design: .rounded))
@@ -53,16 +46,17 @@ struct TranscriptionView: View {
                         .padding(24)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .background(Color("BackgroundSecondary")) // Grigio Scuro
+                .background(Color("BackgroundSecondary"))
                 .frame(maxHeight: 400)
                 
-                // Footer (Stato Lettura)
+                // Footer
                 HStack {
-                    Text(Localization.readingInProgress)
+                    // Native key from Localizable.xcstrings
+                    Text("ui_reading_in_progress")
                         .font(.caption)
                         .foregroundColor(.gray)
                     Spacer()
-                    // Waveform animata
+                    // Animated waveform icon
                     Image(systemName: "waveform")
                         .symbolEffect(.variableColor.iterative.reversing, isActive: true)
                         .foregroundColor(Color("AccentColor"))
@@ -85,11 +79,6 @@ struct TranscriptionView: View {
 }
 
 #Preview {
-    ZStack {
-        Color.gray.ignoresSafeArea()
-        TranscriptionView(
-            text: "Hello world\n\n[TRADUZIONE]\nCiao mondo",
-            onClose: {}
-        )
-    }
+    // Note: Localized keys in previews require the correct environment or real device testing
+    TranscriptionView(text: "Sample transcription text", onClose: {})
 }

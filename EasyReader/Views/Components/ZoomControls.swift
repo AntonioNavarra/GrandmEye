@@ -1,12 +1,6 @@
-//
-//  ZoomSlider.swift
-//  EasyReader
-//
-//  Created by Antonio Navarra on 24/11/25.
-//
-
 import SwiftUI
 
+/// Zoom controls using native String Catalog keys for accessibility.
 struct ZoomControls: View {
     @Binding var value: CGFloat
     let range: ClosedRange<CGFloat>
@@ -22,14 +16,15 @@ struct ZoomControls: View {
                     .clipShape(Circle())
             }
             .disabled(!canDecrease)
-            .accessibilityLabel(String(localized: "ally.zoom"))
+            // Using LocalizedStringKey automatically
+            .accessibilityLabel("ally_zoom_out")
             
             Text(String(format: "%.1fx", value))
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(Color("AccentColor"))
                 .frame(width: 100)
                 .contentTransition(.numericText(value: Double(value)))
-                .accessibilityLabel("Zoom \(String(format: "%.1f", value)) per")
+                .accessibilityLabel("\(String(localized: "ui_read")) \(String(format: "%.1f", value))")
             
             Button(action: increaseZoom) {
                 Image(systemName: "plus")
@@ -40,7 +35,7 @@ struct ZoomControls: View {
                     .clipShape(Circle())
             }
             .disabled(!canIncrease)
-            .accessibilityLabel(Localization.zoomIn)
+            .accessibilityLabel("ally_zoom_in")
         }
         .padding(12)
         .background(

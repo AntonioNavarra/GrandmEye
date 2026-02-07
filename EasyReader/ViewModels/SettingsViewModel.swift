@@ -1,6 +1,6 @@
 //
 //  SettingsViewModel.swift
-//  LenteFacile
+//  EasyReader
 //
 //  Created by Antonio Navarra on 25/11/25.
 //
