@@ -6,7 +6,7 @@ struct CameraView: View {
     @StateObject private var viewModel = CameraViewModel()
     @State private var appSettings = AppSettings.load()
     
-    // MARK: - State Locali
+    // MARK: - Local State
     @State private var freezeZoomFactor: CGFloat = 1.0
     @State private var showSettingsSheet = false
     @State private var isSelectingReadingArea: Bool = false
@@ -22,11 +22,10 @@ struct CameraView: View {
                     FreezeView(
                         image: image,
                         zoomFactor: $freezeZoomFactor,
-                        onUnfreeze: { viewModel.toggleFreeze() },
+                        onUnfreeze: { unfreezeAndReset() },
                         onSave: { savePhoto() }
                     )
                     .transition(.opacity.animation(.easeInOut(duration: 0.3)))
-                    .onAppear { freezeZoomFactor = 1.0 }
                 } else {
                     if let session = viewModel.session {
                         CameraPreview(session: session)
@@ -37,17 +36,8 @@ struct CameraView: View {
                     }
                 }
             }
-            // Night Mode Filter (Red Overlay)
-            .overlay(
-                Rectangle()
-                    .fill(Color.red)
-                    .blendMode(.multiply)
-                    .opacity((appSettings.nightModeEnabled && viewModel.isFrozen) ? 1 : 0)
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea()
-            )
             
-            // 2. Text Selection Area Layer
+            // 2. Text Selection Area Layer (Scanner)
             if isSelectingReadingArea, let image = viewModel.frozenImage {
                 TextSelectionView(image: image) { croppedImage in
                     isSelectingReadingArea = false
@@ -80,9 +70,9 @@ struct CameraView: View {
                     Color.black.opacity(0.6).ignoresSafeArea()
                     VStack(spacing: 20) {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color("ButtonBackgroundPrimary")))
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color("AccentColor")))
                             .scaleEffect(2)
-                        Text("ui_reading_in_progress") // Localized via String Catalog
+                        Text("ui_reading_in_progress")
                             .font(.headline)
                             .foregroundColor(.white)
                     }
@@ -91,6 +81,9 @@ struct CameraView: View {
             }
         }
         .statusBar(hidden: true)
+        .sheet(isPresented: $showSettingsSheet) {
+            SettingsView()
+        }
         .onChange(of: showSettingsSheet) { _, isShowing in
             if !isShowing { appSettings = AppSettings.load() }
         }
@@ -109,7 +102,7 @@ struct CameraView: View {
                     Button(action: { savePhoto() }) {
                         HStack(spacing: 6) {
                             Image(systemName: "square.and.arrow.down.fill")
-                            Text("ui_save") // Native LocalizedStringKey
+                            Text("ui_save")
                                 .fontWeight(.bold)
                         }
                         .font(.system(size: 16))
@@ -119,25 +112,23 @@ struct CameraView: View {
                         .cornerRadius(20)
                     }
                     .padding(.trailing, 8)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(AnyTransition.scale.combined(with: .opacity))
                     .accessibilityLabel("ui_save")
                 }
                 
-                if !viewModel.isFrozen {
-                    Button(action: {
-                        HapticManager.shared.buttonTap()
-                        showSettingsSheet = true
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 26))
-                            .foregroundColor(.white)
-                            .padding(12)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                    .transition(.opacity)
-                    .accessibilityLabel("ally_settings")
+                Button(action: {
+                    HapticManager.shared.buttonTap()
+                    showSettingsSheet = true
+                }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 26))
+                        .foregroundColor(.white)
+                        .padding(12)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
                 }
+                .transition(.opacity)
+                .accessibilityLabel("ally_settings")
             }
             .padding()
             
@@ -145,9 +136,10 @@ struct CameraView: View {
             
             // FOOTER
             VStack(spacing: 30) {
+                // BUTTON BASED ZOOM CONTROLS
                 if !viewModel.isFrozen {
                     ZoomControls(value: $viewModel.zoomFactor, range: 1.0...10.0)
-                        .transition(.scale.combined(with: .opacity))
+                        .transition(AnyTransition.scale.combined(with: .opacity))
                 }
                 
                 HStack(alignment: .center, spacing: 20) {
@@ -202,7 +194,7 @@ struct CameraView: View {
                             bgColor: Color("ButtonBackground"),
                             fgColor: .white
                         ) {
-                            viewModel.toggleFreeze()
+                            unfreezeAndReset()
                         }
                         .accessibilityLabel("ally_back")
                     }
@@ -218,6 +210,11 @@ struct CameraView: View {
     
     // MARK: - Actions
     
+    private func unfreezeAndReset() {
+        viewModel.toggleFreeze()
+        freezeZoomFactor = 1.0
+    }
+    
     private func savePhoto() {
         guard let image = viewModel.frozenImage else { return }
         PhotoManager.shared.saveImage(image) { success, _ in
@@ -228,7 +225,6 @@ struct CameraView: View {
         }
     }
 }
-
 // MARK: - Camera Preview (AVFoundation)
 
 struct CameraPreview: UIViewRepresentable {

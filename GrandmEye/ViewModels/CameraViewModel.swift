@@ -1,17 +1,10 @@
-//
-//  CameraViewModel.swift
-//  EasyReader
-//
-//  Created by Antonio Navarra on 24/11/25.
-//
-
 import SwiftUI
 import AVFoundation
 import Combine
 
-// MARK: - Camera Service (Logica Background)
+// MARK: - Camera Service (Background Logic)
 
-/// Gestisce la complessità di AVFoundation su una coda seriale dedicata.
+/// Manages AVFoundation complexity on a dedicated serial queue.
 private final class CameraService: NSObject, @unchecked Sendable {
     
     private let sessionQueue = DispatchQueue(label: "com.EasyReader.cameraSession")
@@ -175,7 +168,7 @@ final class CameraViewModel: ObservableObject {
     @Published var frozenImage: UIImage?
     @Published var permissionGranted: Bool = false
     
-    // OCR State
+    // OCR & Reading State
     @Published var isReading: Bool = false
     @Published var isProcessingOCR: Bool = false
     @Published var scannedText: String = ""
@@ -188,7 +181,7 @@ final class CameraViewModel: ObservableObject {
         setupBindings()
         service.start()
         
-        // Non chiudere automaticamente il note alla fine della lettura
+        // Ensure speech finish callback is set (even if empty for now)
         OCRManager.shared.onSpeechDidFinish = { }
     }
     
@@ -228,30 +221,38 @@ final class CameraViewModel: ObservableObject {
         HapticManager.shared.buttonTap()
     }
     
+    /// Starts text processing using the language selected in AppSettings.
     func startReading(croppedImage: UIImage) {
         HapticManager.shared.buttonTap()
         isProcessingOCR = true
         scannedText = ""
         
+        // Fetch current app settings to ensure the correct language and accent are used
+        let settings = AppSettings.load()
+        let activeLanguageCode = settings.languageCode
+        
         Task {
-            // 1. Riconoscimento testo grezzo
-            let rawText = await OCRManager.shared.recognizeText(in: croppedImage)
+            // 1. OCR Recognition using the app-selected language
+            let rawText = await OCRManager.shared.recognizeText(in: croppedImage, languageCode: activeLanguageCode)
             
             if let text = rawText {
-                // 2. Normalizzazione Intelligente (Date, Prezzi)
+                // 2. Intelligent Normalization (Dates, Prices)
                 let normalizedText = OCRManager.shared.normalizeText(text)
                 
-                // 3. Aggiorna UI con testo pulito
+                // 3. Update UI with cleaned text
                 self.scannedText = normalizedText
                 self.isProcessingOCR = false
                 self.isReading = true
                 
-                // 4. Parla (usa sempre lingua device)
-                OCRManager.shared.speak(normalizedText)
+                // 4. TTS (Speech) using the accent forced by activeLanguageCode
+                OCRManager.shared.speak(normalizedText, languageCode: activeLanguageCode)
             } else {
                 self.isProcessingOCR = false
                 HapticManager.shared.error()
-                OCRManager.shared.speak("Nessun testo trovato.")
+                
+                // Handle localized "No text found" based on settings
+                let errorMsg = activeLanguageCode == "it" ? "Nessun testo trovato." : "No text found."
+                OCRManager.shared.speak(errorMsg, languageCode: activeLanguageCode)
             }
         }
     }
@@ -261,10 +262,13 @@ final class CameraViewModel: ObservableObject {
     private func handlePhotoCaptured(_ image: UIImage) {
         self.frozenImage = image
         withAnimation { self.isFrozen = true }
+        
+        // Turn off torch when freezing to save battery
         if isTorchOn {
             isTorchOn = false
             service.setTorch(on: false)
         }
+        
         HapticManager.shared.freezeActivated()
         AudioManager.shared.playFreezeSound()
         service.stop()
