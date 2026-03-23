@@ -1,92 +1,98 @@
 # GrandmEye 👁️
 
-<img width="500px" height="500px" alt="standard" src="https://github.com/user-attachments/assets/41ba59b0-d6d3-4e88-bff1-49ebe90833c8" />
+<div align="center">
+<img width="1024" height="1024" alt="standard" src="https://github.com/user-attachments/assets/ed4b24a1-0d56-47b0-872d-1bbbcc7f4442" />
 
-## Project Overview
-GrandmEye is an accessibility-focused iOS magnifier app designed to help users — especially elderly people — read small text comfortably and independently. By combining real-time camera magnification, image freezing, and on-device OCR text recognition, GrandmEye turns any iPhone into a powerful reading assistant. No internet connection required.
+**Smart Magnifier & Text Reader for iOS**
 
-## Features
-- **Live Magnification**: Real-time camera zoom from 1x to 10x with smooth slider control
-- **Freeze & Inspect**: Capture and freeze any frame to read it calmly without shaking
-- **Text Recognition (OCR)**: Select any area of a frozen image and have it read aloud using on-device Vision Framework
-- **Built-in Flashlight**: Illuminate poorly lit labels and documents directly from the app
-- **Save to Camera Roll**: Save magnified captures to your photo library for future reference
-- **Customizable Settings**: Configure default zoom, remember last zoom level, audio feedback, and haptic feedback
-- **Full Localization**: Complete Italian and English support via String Catalog (Localizable.xcstrings)
-- **Accessibility First**: Designed with accessibility labels, haptic feedback, and high-contrast support
+[![Swift](https://img.shields.io/badge/Swift-6.0-orange?style=flat-square&logo=swift)](https://swift.org)
+[![iOS](https://img.shields.io/badge/iOS-16.0+-blue?style=flat-square&logo=apple)](https://developer.apple.com/ios/)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-5.0-purple?style=flat-square&logo=swift)](https://developer.apple.com/xcode/swiftui/)
+[![Vision](https://img.shields.io/badge/Vision-OCR-green?style=flat-square)](https://developer.apple.com/documentation/vision)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)](LICENSE)
 
-## Project Structure
-The project follows a clean MVVM architecture with clear separation of concerns:
+*Turn your iPhone into a powerful reading assistant — magnify, freeze, and read any text aloud, entirely on-device.*
 
-```
-GrandmEye/
-├── Views/
-│   ├── CameraView.swift          # Main camera interface and controls
-│   ├── FreezeView.swift          # Frozen image viewer with pan & zoom
-│   ├── SettingsView.swift        # Settings sheet
-│   └── TranscriptionView.swift   # OCR result display
-├── Managers/
-│   ├── OCRManager.swift          # Vision Framework text recognition
-│   ├── AudioManager.swift        # Sound feedback
-│   ├── HapticManager.swift       # Haptic feedback
-│   └── PhotoManager.swift        # Camera roll saving
-├── Models/
-│   ├── AppSettings.swift         # General app preferences
-│   └── MagnificationSettings.swift # Zoom configuration
-├── Components/
-│   ├── CircleButton.swift        # Reusable circular button
-│   ├── SettingsCard.swift        # Settings section card
-│   └── ZoomSlider.swift          # Custom zoom control
-├── Localization/
-│   ├── Localizable.xcstrings     # IT + EN string catalog
-│   └── Localization.swift        # Type-safe localization enum
-└── Resources/
-    └── Assets.xcassets
-```
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Privacy](#-privacy)
 
-## Technologies Used
-- **Swift** and **SwiftUI** for the iOS application
-- **AVFoundation** for live camera capture and torch control
-- **Vision Framework** for on-device OCR text recognition
-- **Swift Data / UserDefaults** for local settings persistence
-- **UIKit** for camera preview integration (`AVCaptureVideoPreviewLayer`)
-
-## Requirements
-- iOS 16.0+
-- iPhone with rear camera
-- Xcode 15+
-
-## Installation
-To run the project locally:
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/antonio-navarra/GrandmEye.git
-   ```
-2. Open `GrandmEye.xcodeproj` in Xcode
-3. Select your target device or simulator
-4. Build and run (⌘ + R)
-
-> **Note:** Camera and photo library features require a physical device. The simulator does not support live camera input.
-
-## Permissions Required
-| Permission | Purpose |
-|---|---|
-| Camera | Real-time magnification and freeze capture |
-| Photo Library (Add Only) | Saving frozen images to camera roll |
-
-## Future Improvements
-- iCloud sync for saved images across devices
-- Color filter modes (e.g. night mode, high contrast overlays)
-- Apple Watch companion app for quick torch control
-- VoiceOver full compatibility audit
-- iPad optimized layout
-
-## Privacy
-GrandmEye processes all images and text **entirely on-device**. No data is sent to external servers. No account required. No analytics. See [Privacy Policy](./privacy.html) for details.
-
-## License
-This project is distributed under the MIT license. See the `LICENSE` file for more details.
+</div>
 
 ---
 
-GrandmEye was built to make everyday reading accessible for everyone — combining the simplicity of a magnifying glass with the power of modern iOS technology.
+## 👁️ Overview
+
+GrandmEye is an accessibility-focused iOS app designed to help users — especially elderly people — read small print comfortably and independently. Combining real-time camera magnification, image freezing, and on-device OCR text recognition, GrandmEye turns any iPhone into a powerful reading aid. No internet connection required. No account needed. No data leaves your device.
+
+### 🎯 What Makes GrandmEye Special
+
+- **🔍 Up to 10x Magnification**: Smooth, real-time zoom with a single-finger slider
+- **❄️ Freeze & Read**: Capture any frame and inspect it without shaking
+- **🗣️ On-Device OCR**: Select any text area and have it read aloud via Apple's Vision Framework
+- **♿ Accessibility First**: Designed with VoiceOver labels, haptic feedback, and readable typography
+- **🔒 100% Private**: All processing happens locally — no servers, no tracking
+
+---
+
+## ✨ Features
+
+### 🔍 Live Magnification
+- **Real-time Camera Feed** — Instant zoom from 1x to 10x
+- **Smooth Zoom Slider** — Precise control with a custom UI component
+- **Remember Last Zoom** — Option to restore last used zoom level on next launch
+- **Configurable Default Zoom** — Set your preferred starting zoom in Settings
+
+### ❄️ Freeze & Inspect
+- **One-Tap Freeze** — Capture the live frame with a single button press
+- **Pan & Zoom** — Navigate the frozen image freely with drag gestures
+- **Clamped Panning** — Smart boundary detection to keep the image in view
+
+### 🗣️ Text Recognition (OCR)
+- **Custom Selection Area** — Draw a crop region directly on the frozen image
+- **On-Device Processing** — Powered by Apple's Vision Framework, no cloud required
+- **Read Aloud** — Recognized text is spoken using AVSpeechSynthesizer
+- **Transcription View** — Clear, large-font display of the recognized text
+
+### 🔦 & 💾 Utilities
+- **Built-in Flashlight** — Illuminate dark labels and documents
+- **Save to Camera Roll** — Save magnified captures locally via PhotoManager
+- **Audio Feedback** — Subtle sounds for key interactions
+- **Haptic Feedback** — Tactile confirmation on button taps and actions
+
+### 🌍 Localization
+- **Full Italian & English support** via `Localizable.xcstrings` String Catalog
+- **Type-safe string access** through a centralized `Localization` enum
+- Device language automatically selects the correct language
+
+---
+
+## 📱 Screenshots
+
+<div align="center">
+
+### Live Camera View
+*Coming soon*
+
+### Freeze & Text Selection
+*Coming soon*
+
+### Settings
+*Coming soon*
+
+</div>
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+- **Xcode 15.0+**
+- **iOS 16.0+**
+- **iPhone** with rear camera
+- Physical device recommended (camera features require real hardware)
+
+### Setup Instructions
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/antonio-navarra/GrandmEye.git
+   cd GrandmEye
