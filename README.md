@@ -1,7 +1,7 @@
 # GrandmEye 👁️
 
 <div align="center">
-<img width="1024" height="1024" alt="standard" src="https://github.com/user-attachments/assets/ed4b24a1-0d56-47b0-872d-1bbbcc7f4442" />
+<img width="500px" height="500px" alt="standard" src="https://github.com/user-attachments/assets/ed4b24a1-0d56-47b0-872d-1bbbcc7f4442" />
 
 **Smart Magnifier & Text Reader for iOS**
 
