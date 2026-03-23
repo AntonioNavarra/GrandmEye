@@ -1,6 +1,6 @@
 # GrandmEye 👁️
 
-<img width="500" height="500" alt="standard" src="https://github.com/user-attachments/assets/41ba59b0-d6d3-4e88-bff1-49ebe90833c8" />
+<img width="500px" height="500px" alt="standard" src="https://github.com/user-attachments/assets/41ba59b0-d6d3-4e88-bff1-49ebe90833c8" />
 
 ## Project Overview
 GrandmEye is an accessibility-focused iOS magnifier app designed to help users — especially elderly people — read small text comfortably and independently. By combining real-time camera magnification, image freezing, and on-device OCR text recognition, GrandmEye turns any iPhone into a powerful reading assistant. No internet connection required.
