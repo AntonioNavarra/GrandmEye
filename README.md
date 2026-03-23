@@ -70,10 +70,10 @@ GrandmEye is an accessibility-focused iOS app designed to help users — especia
 <div align="center">
 
 ### Live Camera View
-<img width="590px" height="1278px" alt="GrandmEye2" src="https://github.com/user-attachments/assets/5821dc04-10a1-48f2-8b77-3be3346adc95" />
+<img width="300px" height="678px" alt="GrandmEye2" src="https://github.com/user-attachments/assets/5821dc04-10a1-48f2-8b77-3be3346adc95" />
 
 ### Freeze & Text Selection
-<img width="590px" height="1278px" alt="GrandmEye" src="https://github.com/user-attachments/assets/fa69cfd4-0894-43aa-843c-d2dc39a8f62e" />
+<img width="300px" height="678px" alt="GrandmEye" src="https://github.com/user-attachments/assets/fa69cfd4-0894-43aa-843c-d2dc39a8f62e" />
 
 
 </div>
