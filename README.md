@@ -13,7 +13,7 @@
 
 *Turn your iPhone into a powerful reading assistant — magnify, freeze, and read any text aloud, entirely on-device.*
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Privacy](#-privacy)
+[Features](#-features) • [Installation](#-installation) • [Screenshots](#-screenshots) • [Privacy](#-privacy)
 
 </div>
 
@@ -71,7 +71,6 @@ GrandmEye is an accessibility-focused iOS app designed to help users — especia
 |---|---|
 | <img src="https://github.com/user-attachments/assets/5821dc04-10a1-48f2-8b77-3be3346adc95" alt="GrandmEye Live Camera View" width="260" /> | <img src="https://github.com/user-attachments/assets/fa69cfd4-0894-43aa-843c-d2dc39a8f62e" alt="GrandmEye Freeze and Text Selection" width="260" /> |
 
-
 ---
 
 ## 🚀 Installation
@@ -84,7 +83,22 @@ GrandmEye is an accessibility-focused iOS app designed to help users — especia
 
 ### Setup Instructions
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/antonio-navarra/GrandmEye.git
-   cd GrandmEye
+```bash
+git clone https://github.com/AntonioNavarra/GrandmEye.git
+cd GrandmEye
+open GrandmEye.xcodeproj
+```
+
+Select your iPhone as the run destination and build (⌘+R). A physical device is strongly recommended — the magnification and OCR features rely on the real camera and won't work meaningfully in the simulator.
+
+---
+
+## 🔒 Privacy
+
+All processing — magnification, freezing, OCR — happens entirely on-device. No data is collected, transmitted, or stored outside the app. Full privacy policy: [`privacy.html`](privacy.html).
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
