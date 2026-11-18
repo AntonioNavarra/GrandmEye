@@ -84,6 +84,9 @@ struct CameraView: View {
             appSettings = AppSettings.load()
             viewModel.startCamera()
         }
+        #if DEBUG
+        .task { if DemoMode.isClip { await runDemoClip() } }
+        #endif
     }
     
     // MARK: - Content
@@ -93,7 +96,28 @@ struct CameraView: View {
         if viewModel.isFrozen, let image = viewModel.frozenDisplayImage ?? viewModel.frozenImage {
             FreezeView(image: image, zoomFactor: $freezeZoomFactor, visibleRect: $visibleRect)
                 .transition(.opacity.animation(.easeInOut(duration: 0.3)))
-        } else if let session = viewModel.session {
+        } else {
+            liveLayer
+        }
+    }
+    
+    @ViewBuilder
+    private var liveLayer: some View {
+        #if DEBUG
+        if let demo = viewModel.demoImage {
+            DemoPreview(image: demo, mode: viewModel.contrastMode, zoom: viewModel.zoomFactor)
+                .ignoresSafeArea()
+        } else {
+            cameraLayer
+        }
+        #else
+        cameraLayer
+        #endif
+    }
+    
+    @ViewBuilder
+    private var cameraLayer: some View {
+        if let session = viewModel.session {
             Group {
                 if viewModel.contrastMode == .normal {
                     CameraPreview(session: session)
@@ -417,3 +441,67 @@ struct FilteredPreview: UIViewRepresentable {
         uiView.layer.contents = store.image
     }
 }
+
+#if DEBUG
+/// Stands in for the camera view when recording on the simulator.
+private struct DemoPreview: View {
+    let image: UIImage
+    let mode: ContrastMode
+    let zoom: CGFloat
+    
+    var body: some View {
+        GeometryReader { geo in
+            Image(uiImage: ContrastMode.apply(mode, to: image))
+                .resizable()
+                .scaledToFill()
+                .frame(width: geo.size.width, height: geo.size.height)
+                .scaleEffect(max(1, zoom / 2.5))
+                .clipped()
+        }
+    }
+}
+
+extension CameraView {
+    /// Paced tour used to record the README clip: simple mode and reading, then advanced mode.
+    @MainActor
+    fileprivate func runDemoClip() async {
+        func wait(_ seconds: Double) async { try? await Task.sleep(for: .seconds(seconds)) }
+        advancedMode = false
+        await wait(3)
+        viewModel.readFromLive()
+        await wait(7)
+        // The simulator's speech voices are unreliable. If the voice did not start by itself,
+        // walk the highlight over the words so the clip shows the screen as it looks on a phone.
+        if viewModel.highlightRange == nil, viewModel.isReading {
+            let text = viewModel.scannedText as NSString
+            var words: [NSRange] = []
+            text.enumerateSubstrings(in: NSRange(location: 0, length: text.length), options: .byWords) { _, range, _, _ in
+                words.append(range)
+            }
+            for range in words.prefix(60) {
+                viewModel.highlightRange = range
+                await wait(0.28)
+            }
+        } else {
+            await wait(10)
+        }
+        viewModel.closeReading()
+        await wait(1.5)
+        withAnimation { advancedMode = true }
+        await wait(1.5)
+        viewModel.zoomFactor = 4
+        await wait(1.5)
+        for _ in 0..<4 {                       // white, yellow, black on white, back to normal
+            viewModel.cycleContrast()
+            await wait(2)
+        }
+        viewModel.cycleContrast()              // leave yellow on black for the still photo
+        viewModel.cycleContrast()
+        await wait(1.5)
+        viewModel.toggleFreeze()
+        await wait(2)
+        withAnimation { freezeZoomFactor = 2 }
+        await wait(3)
+    }
+}
+#endif

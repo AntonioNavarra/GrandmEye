@@ -1,4 +1,4 @@
-<h1 align="center">GrandmEye</h1>
+<p align="center"><img src="docs/cover.png" alt="GrandmEye: a reading aid for older people. Point, press, listen."></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-iOS%2026%2B-lightgrey?logo=apple" alt="iOS 26+">
@@ -8,6 +8,8 @@
   <img src="https://img.shields.io/badge/dependencies-none-brightgreen" alt="No dependencies">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT">
 </p>
+
+<h1 align="center">GrandmEye</h1>
 
 <p align="center"><b>A reading aid for older people, for iPhone.</b><br>
 Point at the small print, press one big button, and listen: everything happens on the device.</p>
@@ -29,13 +31,18 @@ Point at the small print, press one big button, and listen: everything happens o
 
 ## About the project
 
+<table>
+<tr>
+<td valign="top">
+
 GrandmEye turns the iPhone camera into a magnifier that reads aloud. It is made for people who struggle with medicine leaflets, expiry dates, bills and labels, and who do not want to learn an app: the main screen is one big **LEGGI** (Read) button. Behind it, the app waits until the phone is held still, takes the picture by itself, finds the text with Apple's Vision framework and reads it aloud, highlighting each word as it is spoken.
 
 It is a one-person project. The first version was a camera magnifier with a freeze-frame and a text selector; the current design, described below, was rebuilt after walking through the app as three different users (macular degeneration, hand tremor, first-time smartphone user) and after a relative asked for it.
 
-<p align="center"><img src="docs/design-mockups.png" width="900" alt="Design mock-ups of the eight screens: first view, distance hint, hold still, reading, volume warning, advanced mode and still photo"></p>
-
-<p align="center"><sub>Design mock-ups from the redesign, not screenshots. The shipped screens follow them with less text.</sub></p>
+</td>
+<td align="center" width="300"><img src="docs/demo.gif" width="270" alt="Pressing LEGGI, holding still, listening with the spoken word highlighted, then the advanced mode with contrast and a still photo"></td>
+</tr>
+</table>
 
 ## Features
 
@@ -43,7 +50,7 @@ It is a one-person project. The first version was a camera magnifier with a free
 - **Takes the photo when you are steady:** the gyroscope and accelerometer decide when the phone has stopped moving (with a timeout, so a strong tremor never blocks the app).
 - **Tells you when it cannot read:** if little text is found or Vision is unsure, the app says *Allontana* (move back) with a picture and out loud, instead of reading wrong words.
 - **Reading that sounds like a page:** paragraphs, headings, lists and words split across lines are rebuilt from the position of each line; the voice pauses between paragraphs and the spoken word is highlighted.
-- **Pause and close, nothing else:** the reading screen has big text, one pause button and a close button.
+- **Pause and close, nothing else:** the reading screen has big text, one pause button and a close button; it scrolls by itself to keep the paragraph being read in view.
 - **Volume warning:** if the phone volume is too low to hear the voice, a banner says so.
 - **Advanced mode** (a small control away): three fixed zoom steps (2x, 4x, 8x), a **contrast** button that cycles normal, white on black, yellow on black and black on white live on the camera, a **still photo** you can pinch to zoom and drag, and a torch.
 - **Reads what you see:** on a still photo, *Leggi* reads only the part on screen after zooming and moving.
@@ -60,6 +67,10 @@ It is a one-person project. The first version was a camera magnifier with a free
 | **Say what to do, not what is wrong** | "Allontana", not an error message. |
 | **Safe by default** | A wrong number on a medicine label is worse than no answer, so unsure results are refused and the user is asked to try again. |
 
+<p align="center"><img src="docs/design-mockups.png" width="900" alt="Design mock-ups of the eight screens: first view, distance hint, hold still, reading, volume warning, advanced mode and still photo"></p>
+
+<p align="center"><sub>Design mock-ups from the redesign, not screenshots. The shipped screens follow them with less text.</sub></p>
+
 ## Engineering highlights
 
 | Area | What was done |
@@ -68,7 +79,7 @@ It is a one-person project. The first version was a camera magnifier with a free
 | **Live contrast filters** | Camera frames go through an `AVCaptureVideoDataOutput`; a Core Image pipeline (greyscale, contrast, then a two-colour map) renders them, and the filtered frame is published through a separate observable object so thirty frames a second do not re-render the whole screen. The same filter is applied to still photos off the main thread. |
 | **OCR confidence gate** | The recognised text carries a confidence weighted by line length; below a threshold the app treats it as "too close, blurred or shaky" rather than reading it. |
 | **Page structure from positions** | `TextStructurer` is a pure function from recognised lines and their boxes to text: it merges pieces on the same row, finds paragraph breaks from the gap between lines, keeps list items on their own line, isolates capitalised headings and rejoins hyphenated words. |
-| **Speech** | One `AVSpeechUtterance` per paragraph with a pause between, and a map from each utterance to its offset in the full text so the highlighted word stays correct. |
+| **Speech** | One `AVSpeechUtterance` per paragraph with a pause between, and a map from each utterance to its offset in the full text so the highlighted word stays correct and the reading view can scroll to its paragraph. If the audio session refuses to activate, the app still speaks. |
 | **Visible-area reading** | The still photo works out which part of the image is on screen from the zoom and the position, and crops the original picture to it before recognition. |
 | **Concurrency** | The camera runs on its own serial queue; the app target uses main-actor isolation by default and the frame processor is explicitly `nonisolated`. |
 | **Localisation** | A String Catalog in two languages, plus a helper that looks a key up in a chosen language, so the voice and the screen never disagree with the device language. |
@@ -104,6 +115,18 @@ Select your iPhone as the destination and run the `GrandmEye` scheme. There is n
 
 For more control, tap the sliders control under the button to enter the *advanced* mode: pick 2x, 4x or 8x, cycle the contrast, or press the round camera button to freeze the picture. On a still photo, pinch to zoom, drag to move, then press **Leggi** to read what is on screen. The same switch is in **Opzioni** (Settings).
 
+### Demo mode (debug builds only)
+
+The simulator has no camera, so debug builds accept two launch arguments to record the media in this README. They do not exist in a Release build.
+
+```
+-demoImagePath <png>   use this picture as the camera view and as every photo taken
+-demoClip YES          drive the app through a paced tour: simple mode, hold still, reading,
+                       advanced mode, contrast, still photo with pinch
+```
+
+`scripts/record-demo.sh <simulator-udid>` builds, records the screen and cuts it into `docs/demo.gif` with `scripts/clip-to-gif.swift`; the sample picture is `docs/demo/leaflet.png`. The clip shows the real screens and the real text recognition. The simulator's speech voices are unreliable, so when the voice does not start the tour moves the highlighted word by script.
+
 ## Architecture
 
 ```
@@ -112,7 +135,8 @@ GrandmEye/
   Models/                  AppSettings, MagnificationSettings, ContrastMode
   ViewModels/              CameraViewModel (camera service, reading flow), SettingsViewModel
   Utilities/               OCRManager (Vision + speech), TextStructurer (page layout),
-                           SteadinessMonitor, PhotoManager, Audio/Haptic managers, String+Localized
+                           SteadinessMonitor, PhotoManager, Audio/Haptic managers, String+Localized,
+                           DemoMode (debug only)
   Views/                   CameraView (simple, advanced, still photo), FreezeView (pinch and pan),
                            TranscriptionView (reading), SettingsView, TextSelectionView (unused crop tool)
   Views/Components/        large buttons, zoom steps, settings card
