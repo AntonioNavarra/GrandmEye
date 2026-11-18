@@ -8,7 +8,8 @@ struct AppSettings: Codable {
     var soundVolume: Float = 0.7
     
     /// Stored language code (e.g., "en" or "it").
-    var languageCode: String = Locale.current.language.languageCode?.identifier ?? "en"
+    /// Only Italian and English are supported; any other device language falls back to English.
+    var languageCode: String = Locale.current.language.languageCode?.identifier == "it" ? "it" : "en"
     
     /// Returns a Foundation Locale for SwiftUI environment injection.
     var locale: Locale {

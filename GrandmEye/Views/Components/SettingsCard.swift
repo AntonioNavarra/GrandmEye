@@ -1,6 +1,6 @@
 //
 //  SettingsCard.swift
-//  EasyReader
+//  GrandmEye
 //
 //  Created by Antonio Navarra on 25/11/25.
 //

@@ -1,6 +1,6 @@
 //
 //  MagnificationSettings.swift
-//  EasyReader
+//  GrandmEye
 //
 //  Created by Antonio Navarra on 24/11/25.
 //
