@@ -265,6 +265,8 @@ final class CameraViewModel: ObservableObject {
     @Published var isVolumeLow: Bool = false
     
     let frameStore = FrameStore()
+    /// Debug-only: a picture standing in for the camera (see DemoMode).
+    @Published var demoImage: UIImage?
     
     private let service = CameraService()
     private let steadiness = SteadinessMonitor()
@@ -293,6 +295,13 @@ final class CameraViewModel: ObservableObject {
     func startCamera() {
         guard !cameraStarted else { return }
         cameraStarted = true
+        #if DEBUG
+        if let demo = DemoMode.image {
+            demoImage = demo
+            permissionGranted = true
+            return
+        }
+        #endif
         service.start()
     }
     
@@ -351,8 +360,19 @@ final class CameraViewModel: ObservableObject {
         } else {
             HapticManager.shared.buttonTap()
             captureIntent = .freeze
-            service.capturePhoto()
+            capturePhoto()
         }
+    }
+    
+    /// Takes a photo (in debug demo mode, hands back the demo picture).
+    private func capturePhoto() {
+        #if DEBUG
+        if let demo = demoImage {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in self?.handlePhotoCaptured(demo) }
+            return
+        }
+        #endif
+        service.capturePhoto()
     }
     
     // MARK: - "Leggi" from the live camera
@@ -370,7 +390,7 @@ final class CameraViewModel: ObservableObject {
             guard !Task.isCancelled else { return }
             captureIntent = .read
             readPhase = .processing
-            service.capturePhoto()
+            capturePhoto()
         }
     }
     

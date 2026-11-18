@@ -98,8 +98,8 @@ final class OCRManager: NSObject, AVSpeechSynthesizerDelegate {
             try session.setCategory(.playback, mode: .voicePrompt, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
             try session.setActive(true)
         } catch {
+            // Still try to speak: an audio session that refuses to activate must not leave the user in silence.
             print("OCRManager TTS Error: \(error.localizedDescription)")
-            return
         }
         
         // One utterance per paragraph: a short silence between them, like a person reading.

@@ -24,12 +24,24 @@ struct TranscriptionView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 18))
                 }
                 
-                ScrollView {
-                    Text(highlightedText)
-                        .font(.system(size: 36, weight: .semibold))
-                        .lineSpacing(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 22) {
+                            ForEach(paragraphs, id: \.index) { paragraph in
+                                Text(highlighted(paragraph))
+                                    .font(.system(size: 36, weight: .semibold))
+                                    .lineSpacing(10)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .id(paragraph.index)
+                            }
+                        }
                         .padding(.vertical, 8)
+                    }
+                    // Keep the paragraph being read in view.
+                    .onChange(of: activeParagraph) { _, index in
+                        guard let index else { return }
+                        withAnimation(.easeInOut(duration: 0.4)) { proxy.scrollTo(index, anchor: .center) }
+                    }
                 }
                 
                 LabeledCircleButton(
@@ -46,13 +58,40 @@ struct TranscriptionView: View {
         }
     }
     
-    /// The text with the word being spoken highlighted.
-    private var highlightedText: AttributedString {
-        var attributed = AttributedString(text)
+    private struct Paragraph {
+        let index: Int
+        let start: Int      // where it begins in the full text
+        let text: String
+        var length: Int { (text as NSString).length }
+    }
+    
+    /// The text split at blank lines, each with its position in the full text.
+    private var paragraphs: [Paragraph] {
+        var result: [Paragraph] = []
+        var cursor = 0
+        for (index, part) in text.components(separatedBy: "\n\n").enumerated() {
+            let paragraph = Paragraph(index: index, start: cursor, text: part)
+            result.append(paragraph)
+            cursor += paragraph.length + 2
+        }
+        return result
+    }
+    
+    /// Index of the paragraph that contains the spoken word.
+    private var activeParagraph: Int? {
+        guard let spoken = highlightRange else { return nil }
+        return paragraphs.last(where: { $0.start <= spoken.location })?.index
+    }
+    
+    /// A paragraph with the word being spoken highlighted.
+    private func highlighted(_ paragraph: Paragraph) -> AttributedString {
+        var attributed = AttributedString(paragraph.text)
         attributed.foregroundColor = .white
-        if let ns = highlightRange,
-           let range = Range(ns, in: text),
-           let attrRange = Range(range, in: attributed) {
+        guard let spoken = highlightRange,
+              spoken.location >= paragraph.start, spoken.location < paragraph.start + paragraph.length else { return attributed }
+        let local = NSRange(location: spoken.location - paragraph.start,
+                            length: min(spoken.length, paragraph.length - (spoken.location - paragraph.start)))
+        if let range = Range(local, in: paragraph.text), let attrRange = Range(range, in: attributed) {
             attributed[attrRange].backgroundColor = UIColor(named: "ButtonBackgroundPrimary") ?? .yellow
             attributed[attrRange].foregroundColor = .black
         }
