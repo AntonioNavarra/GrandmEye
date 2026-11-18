@@ -67,10 +67,6 @@ It is a one-person project. The first version was a camera magnifier with a free
 | **Say what to do, not what is wrong** | "Allontana", not an error message. |
 | **Safe by default** | A wrong number on a medicine label is worse than no answer, so unsure results are refused and the user is asked to try again. |
 
-<p align="center"><img src="docs/design-mockups.png" width="900" alt="Design mock-ups of the eight screens: first view, distance hint, hold still, reading, volume warning, advanced mode and still photo"></p>
-
-<p align="center"><sub>Design mock-ups from the redesign, not screenshots. The shipped screens follow them with less text.</sub></p>
-
 ## Engineering highlights
 
 | Area | What was done |
