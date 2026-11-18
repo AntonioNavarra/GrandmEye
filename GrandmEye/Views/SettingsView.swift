@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
     @Environment(\.dismiss) var dismiss
+    @AppStorage("advancedMode") private var advancedMode = false
     
     var body: some View {
         NavigationStack {
@@ -21,6 +22,12 @@ struct SettingsView: View {
                             }
                             .pickerStyle(.segmented)
                             .padding(.vertical, 8)
+                        }
+                        
+                        // Simple / advanced mode
+                        SettingsCard(title: "settings_advanced_mode", icon: "slider.horizontal.3") {
+                            Toggle("settings_advanced_mode", isOn: $advancedMode)
+                                .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
                         }
                         
                         // Magnification settings

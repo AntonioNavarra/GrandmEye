@@ -17,7 +17,7 @@ struct ZoomControls: View {
                     .clipShape(Circle())
             }
             .disabled(value <= range.lowerBound)
-            .accessibilityLabel("Decrease zoom")
+            .accessibilityLabel("ally_zoom_out")
             
             // VALUE DISPLAY
             Text(String(format: "%.1fx", value))
@@ -36,7 +36,7 @@ struct ZoomControls: View {
                     .clipShape(Circle())
             }
             .disabled(value >= range.upperBound)
-            .accessibilityLabel("Increase zoom")
+            .accessibilityLabel("ally_zoom_in")
         }
         .padding(12)
         .background(
