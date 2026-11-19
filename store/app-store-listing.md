@@ -3,7 +3,8 @@
 Text for App Store Connect, in Italian (primary) and English. Limits checked: name 30, subtitle 30,
 promotional text 170, keywords 100, description 4000, what's new 4000 characters.
 
-The six screenshots per language (yellow and black slides, phone bleeding off the bottom edge, one headline each)
+The six screenshots per language: alternating yellow and black slides, a slightly tilted phone with a glossy frame, one headline each,
+and a large yellow lens (the app's own idea, a magnifier) placed over the element the headline talks about; the last one is typographic
 are built from the demo mode and uploaded as 6.7" (1290 x 2796) and 6.5" (1284 x 2778) JPEGs without alpha:
 the API has no 6.9" type and rejects PNGs with transparency. Headlines (Italian / English):
 1 "Il telefono che legge per te." / "Your phone reads for you."
