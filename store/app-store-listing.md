@@ -112,4 +112,4 @@ A new version made for people who find reading hard:
 - **App privacy:** Data Not Collected (no account, no network, no analytics; camera and add-only photo access are used on the device).
 - **Review notes:** "Point the camera at printed text and press LEGGI (READ). No account or login is needed. The camera is used to read text; motion sensors only detect whether the phone is held still. Nothing is sent anywhere."
 - **Support and privacy URLs:** keep the existing ones (`support.html`, `privacy.html` in this repository).
-- **Version:** the redesign is a new version, 1.1 (currently 1.0, build 1); bump the version and the build before archiving.
+- **Version:** the redesign is version 1.1, build 2 (the App Store has 1.0, build 1).
