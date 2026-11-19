@@ -1,7 +1,7 @@
 <p align="center"><img src="docs/cover.png" alt="GrandmEye: a reading aid for older people. Point, press, listen."></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/platform-iOS%2026%2B-lightgrey?logo=apple" alt="iOS 26+">
+  <img src="https://img.shields.io/badge/platform-iOS%2017%2B-lightgrey?logo=apple" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white" alt="Swift 5">
   <img src="https://img.shields.io/badge/UI-SwiftUI-0A84FF" alt="SwiftUI">
   <img src="https://img.shields.io/badge/OCR-Vision-34C759" alt="Vision">
@@ -90,8 +90,8 @@ It is a one-person project. The first version was a camera magnifier with a free
 
 ### Prerequisites
 
-- A Mac with Xcode 26 or later
-- An iPhone running iOS 26 or later. The camera features need a real device; the simulator only shows the interface.
+- A Mac with Xcode 26 or later (the app itself runs on iOS 17 and later)
+- An iPhone running iOS 17 or later. The camera features need a real device; the simulator only shows the interface.
 
 ### Installation
 
