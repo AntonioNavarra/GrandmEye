@@ -1,6 +1,10 @@
 <p align="center"><img src="docs/cover.png" alt="GrandmEye: a reading aid for older people. Point, press, listen."></p>
 
 <p align="center">
+  <a href="https://apps.apple.com/app/id6758917709"><img src="https://img.shields.io/badge/App%20Store-Download-FFD60A?style=for-the-badge&logo=apple&logoColor=black" alt="Download on the App Store"></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/platform-iOS%2017%2B-lightgrey?logo=apple" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white" alt="Swift 5">
   <img src="https://img.shields.io/badge/UI-SwiftUI-0A84FF" alt="SwiftUI">
@@ -17,6 +21,7 @@ Point at the small print, press one big button, and listen: everything happens o
 ## Table of contents
 
 - [About the project](#about-the-project)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Design principles](#design-principles)
 - [Engineering highlights](#engineering-highlights)
@@ -43,6 +48,12 @@ It is a one-person project. The first version was a camera magnifier with a free
 <td align="center" width="300"><img src="docs/demo.gif" width="270" alt="Pressing LEGGI, holding still, listening with the spoken word highlighted, then the advanced mode with contrast and a still photo"></td>
 </tr>
 </table>
+
+## Screenshots
+
+<p align="center"><img src="docs/gallery.png" alt="Six screens of GrandmEye: your phone reads for you, one button, shaky hands, more contrast, zoom with two fingers, all on your phone"></p>
+
+<p align="center"><sub>The App Store screenshots. The yellow lens shows the detail each headline talks about.</sub></p>
 
 ## Features
 
