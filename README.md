@@ -15,39 +15,30 @@
 
 <h1 align="center">GrandmEye</h1>
 
-<p align="center"><b>A reading aid for older people, for iPhone.</b><br>
-Point at the small print, press one big button, and listen: everything happens on the device.</p>
-
-## Table of contents
-
-- [About the project](#about-the-project)
-- [Screenshots](#screenshots)
-- [Features](#features)
-- [Design principles](#design-principles)
-- [Engineering highlights](#engineering-highlights)
-- [Built with](#built-with)
-- [Getting started](#getting-started)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [Privacy](#privacy)
-- [Status](#status)
-- [License](#license)
-- [Author](#author)
-
-## About the project
+<p align="center"><b>Point. Press. Listen.</b><br>
+A reading aid for older people, for iPhone: medicine leaflets, expiry dates, bills, labels.</p>
 
 <table>
 <tr>
-<td valign="top">
+<td valign="middle">
 
-GrandmEye turns the iPhone camera into a magnifier that reads aloud. It is made for people who struggle with medicine leaflets, expiry dates, bills and labels, and who do not want to learn an app: the main screen is one big **LEGGI** (Read) button. Behind it, the app waits until the phone is held still, takes the picture by itself, finds the text with Apple's Vision framework and reads it aloud, highlighting each word as it is spoken.
+### One button. Nothing to learn.
 
-It is a one-person project. The first version was a camera magnifier with a freeze-frame and a text selector; the current design, described below, was rebuilt after walking through the app as three different users (macular degeneration, hand tremor, first-time smartphone user) and after a relative asked for it.
+- **Press READ** and the phone reads the text aloud.
+- **It takes the picture by itself** when the phone is still, even with slightly shaky hands.
+- **Each word lights up** as it is spoken.
+- **Everything stays on the phone.** No account, no ads.
 
 </td>
 <td align="center" width="300"><img src="docs/demo.gif" width="270" alt="Pressing LEGGI, holding still, listening with the spoken word highlighted, then the advanced mode with contrast and a still photo"></td>
 </tr>
 </table>
+
+## How it works
+
+1. **Point** the phone at the text.
+2. **Press READ** and hold still for a moment.
+3. **Listen.** If the text is too close or blurred, the app says *Move back* instead of reading wrong words.
 
 ## Screenshots
 
@@ -55,18 +46,39 @@ It is a one-person project. The first version was a camera magnifier with a free
 
 <p align="center"><sub>The App Store screenshots. The yellow lens shows the detail each headline talks about.</sub></p>
 
-## Features
+## What it does
 
-- **One-button reading:** the *Simple* mode is the default. Press LEGGI, hold still, listen. No area to draw, nothing to configure.
-- **Takes the photo when you are steady:** the gyroscope and accelerometer decide when the phone has stopped moving (with a timeout, so a strong tremor never blocks the app).
-- **Tells you when it cannot read:** if little text is found or Vision is unsure, the app says *Allontana* (move back) with a picture and out loud, instead of reading wrong words.
-- **Reading that sounds like a page:** paragraphs, headings, lists and words split across lines are rebuilt from the position of each line; the voice pauses between paragraphs and the spoken word is highlighted.
-- **Pause and close, nothing else:** the reading screen has big text, one pause button and a close button; it scrolls by itself to keep the paragraph being read in view.
-- **Volume warning:** if the phone volume is too low to hear the voice, a banner says so.
-- **Advanced mode** (a small control away): three fixed zoom steps (2x, 4x, 8x), a **contrast** button that cycles normal, white on black, yellow on black and black on white live on the camera, a **still photo** you can pinch to zoom and drag, and a torch.
-- **Reads what you see:** on a still photo, *Leggi* reads only the part on screen after zooming and moving.
-- **Dates and euro amounts read naturally** in the chosen language (for example "5 euro e 50 centesimi").
-- **Two languages:** Italian and English, chosen in Settings; the spoken text, the dates and the messages all follow it.
+| | |
+|---|---|
+| **One button** | Press READ, hold still, listen. No area to draw, nothing to set up. |
+| **Shaky hands** | Takes the picture when the phone stops moving. |
+| **Reads like a page** | Paragraphs, headings and lists, with a pause between them. |
+| **Contrast** | White on black, yellow on black or black on white, live on the camera. |
+| **Zoom** | 2x, 4x and 8x, and a two-finger pinch on a still photo; it reads only what you see. |
+| **Dates and euros** | Read naturally ("5 euro e 50 centesimi"). |
+| **Italian and English** | The voice, the dates and the messages follow the chosen language. |
+
+## Made for
+
+People who struggle with small print, and for the relatives who set the phone up for them. The main screen has one big button, no onboarding and no menus to learn.
+
+## Privacy
+
+No account, no ads, no network. The camera, the text recognition and the voice all work on the phone. A picture is saved to the library only if you press Save. Full policy: [`privacy.html`](privacy.html).
+
+## Get the app
+
+<p align="center">
+  <a href="https://apps.apple.com/app/id6758917709"><img src="https://img.shields.io/badge/App%20Store-Download-FFD60A?style=for-the-badge&logo=apple&logoColor=black" alt="Download on the App Store"></a>
+</p>
+
+Requires an iPhone with iOS 17 or later. Italian and English.
+
+---
+
+# For developers
+
+[Design principles](#design-principles) · [Engineering highlights](#engineering-highlights) · [Built with](#built-with) · [Getting started](#getting-started) · [Usage](#usage) · [Architecture](#architecture) · [Status](#status) · [License](#license)
 
 ## Design principles
 
@@ -157,13 +169,9 @@ GrandmEye/
 | **The OCR runs on the original photo, never on the filtered one.** | A colour filter must not change what is read. |
 | **The manual crop selector is kept but not used.** | "Read" now reads the whole frame or the visible part; the tool may come back as an option. |
 
-## Privacy
-
-No account, no network access, no analytics. The camera is used to see the text and to take the picture that is read; pictures are saved to the photo library only if you press Save, and the permission asks for add-only access. Motion sensors are used only to know whether the phone is still and nothing is stored. The full policy is in [`privacy.html`](privacy.html); help is in [`support.html`](support.html).
-
 ## Status
 
-Version 1.0 is on the App Store. The redesign described here (simple mode, hold-still capture, structured reading, live contrast, pinch on still photos) is on the `miglioramenti-base` branch and has not been released. It builds and it was installed on a physical iPhone, but it has **not yet been tried with the people it was designed for**; the thresholds (how still is "still", how unsure is "too unsure", how large a gap is a new paragraph) are first estimates. There are no automated tests yet.
+Version 1.0 is on the App Store. Version 1.1, the redesign described here, is built and in TestFlight, and its App Store page is prepared; it is not released yet. It was tried by one older person, who found it clear, but it has not been tested more widely: the thresholds (how still is "still", how unsure is "too unsure", how large a gap is a new paragraph) are first estimates. There are no automated tests.
 
 Known limits: text in several columns is read in top-to-bottom order, so columns can mix; the pinch zooms around the centre of the screen rather than between the fingers; only Italian and English are supported for text recognition and voice.
 
